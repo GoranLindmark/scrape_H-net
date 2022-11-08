@@ -1,4 +1,4 @@
-# library(ScrapeHemnet)
+library(ScrapeHemnet)
 library(tidyverse)
 
 data <- runScrapeHemnet()
@@ -18,9 +18,16 @@ data %>%
 
 corData <-
   data %>%
-  select(rum, pris, hyra, kvmPris) %>%
-  drop_na()
-cor(corData[, 1:4])
+  select(rum, hyra, pris, kvmPris, area, kvm) %>%
+  filter( str_detect( kvm, " ", negate = T) ) %>% 
+  mutate(area = ifelse(area == "södermalm",1,
+                       ifelse(area == "kungsholmen",2,
+                              ifelse(area == "vasastan",3,
+                                     ifelse(area == "östermalm",4,0))))) %>% 
+  drop_na() %>% 
+  mutate( kvm = as.numeric(kvm))
+
+cor(corData[, 1:6])
 
 
 data %>%
