@@ -1,4 +1,4 @@
-Package: dummy
+Package: ScrapeHemnet
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
@@ -14,9 +14,11 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     dplyr,
-    ggplot2,
-    lubridate,
     purrr,
     rvest,
-    tidyr,
-    xml2
+    magrittr, 
+    tidyr, 
+    xml2,
+    stringr,
+    lubridate
+RoxygenNote: 7.2.1

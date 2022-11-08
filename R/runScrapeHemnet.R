@@ -3,31 +3,24 @@
 #' @export
 #'
 #' @importFrom magrittr %>%
-#' @import 
+
 #'
 runScrapeHemnet <- function(){
-  # library(rvest)
-  # library(xml2)
-  # library(tidyverse)
-  # library(data.table)
-  # library(purrr)
-  # library(lubridate)
-
 
 
 kungsholmen <- "898748"
-södermalm <- "898472"
+sodermalm <- "898472"
 vasastan <- "925970"
-östermalm <- "473448"
+ostermalm <- "473448"
 
 
-söder <- scrapeHemnet(södermalm)
+soder <- scrapeHemnet(sodermalm)
 kungsholmen <- scrapeHemnet(kungsholmen)
 vasastan <- scrapeHemnet(vasastan)
-östermalm <- scrapeHemnet(östermalm)
+ostermalm <- scrapeHemnet(ostermalm)
 
-söder <-
-  söder %>%
+soder <-
+  soder %>%
   mutate(area = "södermalm")
 
 kungsholmen <-
@@ -38,11 +31,11 @@ vasastan <-
   vasastan %>%
   mutate(area = "vasastan")
 
-östermalm <-
-  östermalm %>%
+ostermalm <-
+  ostermalm %>%
   mutate(area = "östermalm")
 
-totRes <- bind_rows(söder, kungsholmen, vasastan, östermalm)
+totRes <- bind_rows(soder, kungsholmen, vasastan, ostermalm)
 
 
 }

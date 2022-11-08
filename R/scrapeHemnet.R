@@ -1,18 +1,15 @@
 #' scrapeHemnet
 #'
-#' @param area 
+#' @param area numeric value from hemnet
 #'
 #' @return totRes
 #' @export 
 #'
-#' @import rvest, xml12, data.table, purrr, 
-#'  lubridate,
-#'   ggplot2,
-#'    dplyr
+#' @import rvest xml2 purrr dplyr tidyr stringr lubridate
 #'    
 #' @importFrom magrittr %>%
 #'    
-#' @examples scrapeHemnet("898748")
+
 scrapeHemnet <- function(area) {
   
   for (page in 1:49) {
@@ -56,7 +53,7 @@ scrapeHemnet <- function(area) {
           gsub("[^[:digit:].]", "", .) %>%
           as.numeric(),
         
-        # Såld Datum
+        # Sald Datum
         rvest::html_nodes(htmlfile, ".sold-property-listing__sold-date") %>%
           rvest::html_text() %>%
           gsub(pattern = "\n ", replacement = "") %>%
@@ -64,12 +61,12 @@ scrapeHemnet <- function(area) {
           gsub(pattern = "Såld", replacement = "") %>%
           gsub(pattern = " ", replacement = ""),
         
-        #  Över eller under utropspris
+        #  Over eller under utropspris
         rvest::html_nodes(htmlfile, ".sold-property-listing__price-change") %>%
           rvest::html_text() %>%
           gsub(pattern = "\n ", replacement = "") %>%
           gsub(pattern = " ", replacement = "") %>%
-          mutate( rum = str_replace(rum, "%", "")),
+          gsub(pattern = "%", replacement = ""),
         
         # Pris per kvm
         rvest::html_nodes(htmlfile, ".sold-property-listing__price-per-m2") %>%
@@ -79,7 +76,7 @@ scrapeHemnet <- function(area) {
           gsub("[^[:digit:].]", "", .) %>%
           as.numeric(),
         
-        # Försäljnings objekt ( Lgh, Radhus, Tomt... )
+        # Forsaljnings objekt ( Lgh, Radhus, Tomt... )
         rvest::html_nodes(htmlfile, ".svg-icon__fallback-text") %>%
           rvest::html_text() %>%
           gsub(pattern = "\n ", replacement = "") %>%
@@ -88,9 +85,9 @@ scrapeHemnet <- function(area) {
       purrr::transpose() %>%
       unlist(recursive = T) %>%
       matrix(ncol = 8, byrow = T) %>%
-      tibble::as_tibble() %>%
+      tidyr::as_tibble() %>%
       dplyr::mutate (across (c (V3, V4, V7), as.numeric)) %>%
-      dplyr::mutate(V5 = dmy(V5)) %>%
+      dplyr::mutate(V5 = lubridate::dmy(V5)) %>%
       dplyr::rename(
         address = V1,
         kvm = V2,
@@ -102,14 +99,14 @@ scrapeHemnet <- function(area) {
         objektTyp = V8
       ) %>%
       
-      dplyr::mutate(år = year(soldDate), månad = month(soldDate)) %>%
-      separate(kvm, c("kvm", "rum"), "m²") %>%
-      mutate( kvm = str_trim(kvm)) %>%
-      mutate( kvm = str_replace(kvm, ",", ".")) %>%
-      mutate( rum = str_replace(rum, ",", ".")) %>%
-      mutate( rum = str_replace(rum, "rum", "")) %>%
-      mutate( rum = str_trim(rum)) %>%
-      mutate(rum = as.numeric(rum))
+      dplyr::mutate(ar = year(soldDate), manad = month(soldDate)) %>%
+      tidyr::separate(kvm, c("kvm", "rum"), "m²") %>%
+      dplyr::mutate( kvm = stringr::str_trim(kvm)) %>%
+      dplyr::mutate( kvm = stringr::str_replace(kvm, ",", ".")) %>%
+      dplyr::mutate( rum = stringr::str_replace(rum, ",", ".")) %>%
+      dplyr::mutate( rum = stringr::str_replace(rum, "rum", "")) %>%
+      dplyr::mutate( rum = stringr::str_trim(rum)) %>%
+      dplyr::mutate(rum = as.numeric(rum))
     
     if (page == 1) {
       totRes <- res
