@@ -1,10 +1,11 @@
 # library(ScrapeHemnet)
+library(tidyverse)
 
 data <- runScrapeHemnet()
 
 data <-
   data %>%
-  mutate(period = paste0(str_sub(år,3,4), månad = ifelse(månad<10, paste0("0",månad), månad))) %>%
+  mutate(period = paste0(str_sub(ar,3,4), manad = ifelse(manad<10, paste0("0",manad), manad))) %>%
   mutate(period = as.numeric(period))
 
 
@@ -17,9 +18,9 @@ data %>%
 
 corData <-
   data %>%
-  select(rum, pris, kvmPris) %>%
+  select(rum, pris, hyra, kvmPris) %>%
   drop_na()
-cor(corData[, 1:3])
+cor(corData[, 1:4])
 
 
 data %>%
@@ -37,12 +38,12 @@ data %>%
 
 data %>%
   filter( !is.na(kvmPris)) %>%
-  filter( !is.na(år)) %>%
-  group_by(år, månad) %>%
+  filter( !is.na(ar)) %>%
+  group_by(ar, manad) %>%
   summarize(antal = n()) %>%
   ggplot()+
-  geom_line (aes(x= månad, y=antal))+
-  facet_grid(cols = vars(år))
+  geom_line (aes(x= manad, y=antal))+
+  facet_grid(cols = vars(ar))
 
 
 data %>%
